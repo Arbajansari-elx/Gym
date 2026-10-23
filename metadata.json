@@ -1,0 +1,6 @@
+{
+  "name": "Mahadev Gym Fitness - Premium Fitness Club",
+  "description": "Official public website for Mahadev Gym Fitness. Train hard, stay disciplined, and become unstoppable with structured workout plans and personal guidance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

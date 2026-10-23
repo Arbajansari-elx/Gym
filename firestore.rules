@@ -1,0 +1,79 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Public Join Now Enquiries: Anyone can submit an enquiry with validated payload
+    match /enquiries/{enquiryId} {
+      allow create: if isValidId(enquiryId)
+                    && incoming().name is string && incoming().name.size() > 0 && incoming().name.size() <= 100
+                    && incoming().phone is string && incoming().phone.size() >= 8 && incoming().phone.size() <= 20
+                    && incoming().session is string && incoming().session.size() <= 30
+                    && incoming().timeSlot is string && incoming().timeSlot.size() <= 60
+                    && incoming().status in ['Pending', 'Contacted', 'Converted', 'Dropped'];
+      allow read, update, delete: if isSignedIn();
+    }
+
+    // Gym Members collection: Management access for admin
+    match /members/{memberId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Active Members Index:
+    // Safe lookup by exact normalized name slug for QR validation.
+    // Listing/scraping is strictly forbidden to protect member privacy.
+    match /active_members_index/{nameSlug} {
+      allow get: if isValidId(nameSlug);
+      allow list: if false;
+      allow write: if isSignedIn();
+    }
+
+    // Daily Attendance logs:
+    // QR attendance creates a new document using deterministic key att_{memberId}_{date}_{session}.
+    // Firestore's create rule ensures duplicate submissions for the same session fail atomically.
+    // Reads, edits, corrections, and deletions are strictly restricted to signed-in admins.
+    match /attendance/{attendanceId} {
+      allow create: if isValidId(attendanceId)
+                    && incoming().memberName is string && incoming().memberName.size() > 0 && incoming().memberName.size() <= 100
+                    && incoming().session in ['Morning', 'Evening']
+                    && incoming().date is string && incoming().date.size() == 10
+                    && incoming().type in ['QR', 'Manual', 'Biometric']
+                    && incoming().status in ['Present', 'Late', 'Excused'];
+      allow read, update, delete: if isSignedIn();
+    }
+
+    // Fee Payments & Transaction History
+    match /payments/{paymentId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Equipment & Maintenance Tracker
+    match /equipment/{equipmentId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Membership Plans: readable by anyone, writable by signed-in admin
+    match /plans/{planId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+  }
+}

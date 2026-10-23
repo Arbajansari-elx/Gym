@@ -1,0 +1,169 @@
+{
+  "entities": {
+    "Enquiry": {
+      "title": "Enquiry",
+      "description": "Public Join Now enquiry submitted by prospective gym members.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 20 },
+        "session": { "type": "string", "enum": ["Morning", "Evening", "Any"] },
+        "timeSlot": { "type": "string", "maxLength": 60 },
+        "message": { "type": "string", "maxLength": 500 },
+        "status": { "type": "string", "enum": ["Pending", "Contacted", "Converted", "Dropped"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string", "maxLength": 1000 }
+      },
+      "required": ["name", "phone", "session", "timeSlot", "status", "createdAt"]
+    },
+    "Member": {
+      "title": "Member",
+      "description": "Registered gym member profile with membership and session details.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "memberId": { "type": "string", "maxLength": 30 },
+        "name": { "type": "string", "maxLength": 100 },
+        "phone": { "type": "string", "maxLength": 20 },
+        "email": { "type": "string", "maxLength": 100 },
+        "gender": { "type": "string", "enum": ["Male", "Female", "Other"] },
+        "age": { "type": "number" },
+        "emergencyPhone": { "type": "string", "maxLength": 20 },
+        "bloodGroup": { "type": "string", "maxLength": 10 },
+        "session": { "type": "string", "enum": ["Morning", "Evening"] },
+        "timeSlot": { "type": "string", "maxLength": 60 },
+        "planId": { "type": "string", "maxLength": 50 },
+        "planName": { "type": "string", "maxLength": 100 },
+        "startDate": { "type": "string", "maxLength": 30 },
+        "endDate": { "type": "string", "maxLength": 30 },
+        "fee": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "pendingAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["Active", "Expired", "Frozen"] },
+        "photoUrl": { "type": "string", "maxLength": 500 },
+        "notes": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "phone", "session", "planName", "startDate", "endDate", "fee", "status", "createdAt"]
+    },
+    "Attendance": {
+      "title": "Attendance",
+      "description": "Daily attendance check-in record for members with session and audit details.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "memberDocId": { "type": "string", "maxLength": 128 },
+        "memberId": { "type": "string", "maxLength": 30 },
+        "memberName": { "type": "string", "maxLength": 100 },
+        "session": { "type": "string", "enum": ["Morning", "Evening"] },
+        "checkInTime": { "type": "string", "format": "date-time" },
+        "date": { "type": "string", "maxLength": 20 },
+        "dayOfWeek": { "type": "string", "maxLength": 20 },
+        "type": { "type": "string", "enum": ["Manual", "QR", "Biometric"] },
+        "status": { "type": "string", "enum": ["Present", "Late", "Excused"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string", "maxLength": 300 },
+        "correctionReason": { "type": "string", "maxLength": 300 },
+        "updatedBy": { "type": "string", "maxLength": 100 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["memberName", "session", "date", "status"]
+    },
+    "ActiveMemberIndex": {
+      "title": "ActiveMemberIndex",
+      "description": "Public name-based lookup index containing only active member names without any sensitive PII.",
+      "type": "object",
+      "properties": {
+        "memberId": { "type": "string", "maxLength": 30 },
+        "memberName": { "type": "string", "maxLength": 100 },
+        "session": { "type": "string", "enum": ["Morning", "Evening"] },
+        "status": { "type": "string", "enum": ["Active", "Expired", "Frozen"] },
+        "isAmbiguous": { "type": "boolean" },
+        "count": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["memberName", "status"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Financial payment transaction recorded for a member.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "invoiceNumber": { "type": "string", "maxLength": 50 },
+        "memberDocId": { "type": "string", "maxLength": 128 },
+        "memberName": { "type": "string", "maxLength": 100 },
+        "memberPhone": { "type": "string", "maxLength": 20 },
+        "amount": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["UPI", "Cash", "Card", "NetBanking"] },
+        "paymentDate": { "type": "string", "format": "date-time" },
+        "planName": { "type": "string", "maxLength": 100 },
+        "notes": { "type": "string", "maxLength": 300 },
+        "receivedBy": { "type": "string", "maxLength": 100 }
+      },
+      "required": ["invoiceNumber", "memberName", "amount", "paymentMethod", "paymentDate"]
+    },
+    "Equipment": {
+      "title": "Equipment",
+      "description": "Gym equipment inventory and maintenance status.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string", "enum": ["Strength", "Cardio", "FreeWeights", "CableMachines", "Accessories"] },
+        "quantity": { "type": "number" },
+        "status": { "type": "string", "enum": ["Working", "Needs Repair", "Under Maintenance"] },
+        "lastMaintenanceDate": { "type": "string", "maxLength": 30 },
+        "nextMaintenanceDate": { "type": "string", "maxLength": 30 },
+        "notes": { "type": "string", "maxLength": 300 }
+      },
+      "required": ["name", "category", "quantity", "status"]
+    },
+    "Plan": {
+      "title": "Plan",
+      "description": "Configured membership packages and subscription tiers.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "durationMonths": { "type": "number" },
+        "price": { "type": "number" },
+        "features": { "type": "string", "maxLength": 500 },
+        "isPopular": { "type": "boolean" }
+      },
+      "required": ["name", "durationMonths", "price"]
+    }
+  },
+  "firestore": {
+    "/enquiries/{enquiryId}": {
+      "schema": "Enquiry",
+      "description": "Visitor contact enquiries and Join Now requests from the public site."
+    },
+    "/members/{memberId}": {
+      "schema": "Member",
+      "description": "Active, expired, and frozen gym members database."
+    },
+    "/attendance/{attendanceId}": {
+      "schema": "Attendance",
+      "description": "Daily gym check-in records."
+    },
+    "/payments/{paymentId}": {
+      "schema": "Payment",
+      "description": "Fee payment records, receipts and transaction history."
+    },
+    "/equipment/{equipmentId}": {
+      "schema": "Equipment",
+      "description": "Gym equipment inventory and maintenance schedules."
+    },
+    "/active_members_index/{nameSlug}": {
+      "schema": "ActiveMemberIndex",
+      "description": "Safe active member name-to-ID lookup index for QR attendance validation."
+    },
+    "/plans/{planId}": {
+      "schema": "Plan",
+      "description": "Gym membership subscription plans and pricing."
+    }
+  }
+}
